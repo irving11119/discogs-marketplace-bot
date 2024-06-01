@@ -17,10 +17,10 @@ func main() {
 	defer cancel()
 
 	opts := []bot.Option{
-		bot.WithDefaultHandler(handler),
+		bot.WithDefaultHandler(defaultHandler),
 	}
 
-	b, err := bot.New(os.Getenv("TELEGRAM_API_BOT"), opts...)
+	teleBot, err := bot.New(os.Getenv("TELEGRAM_API_BOT"), opts...)
 	if nil != err {
 		// panics for the sake of simplicity.
 		// you should handle this error properly in your code.
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	WebHookUrl := os.Getenv("WEBHOOK_URL")
-	res, err := b.SetWebhook(ctx, &bot.SetWebhookParams{
+	res, err := teleBot.SetWebhook(ctx, &bot.SetWebhookParams{
 		URL: WebHookUrl,
 	})
 
@@ -37,7 +37,7 @@ func main() {
 	}
 
 	go func() {
-		err := http.ListenAndServe(":8080", b.WebhookHandler())
+		err := http.ListenAndServe(":8080", teleBot.WebhookHandler())
 
 		if err != nil {
 			log.Fatalf("Failed to start server")
@@ -45,12 +45,12 @@ func main() {
 	}()
 
 	// Use StartWebhook instead of Start
-	b.StartWebhook(ctx)
+	teleBot.StartWebhook(ctx)
 
 	// call methods.DeleteWebhook if needed
 }
 
-func handler(ctx context.Context, b *bot.Bot, update *models.Update) {
+func defaultHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
 		Text:   update.Message.Text,
