@@ -23,6 +23,6 @@ go.work.sum
 go.sum
 
 # Environment variables file
-.env
-.env.*
+/.env
+/.env.*
 
